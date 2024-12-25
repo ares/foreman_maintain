@@ -5,7 +5,7 @@ module Checks
         description 'Provisioning facts about the system'
       end
 
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
       def run
         hosts_in_3_months =
           sql_count(
@@ -24,7 +24,7 @@ module Checks
               group by type
             SQL
           ).
-          to_h { |row| [row['type'], row['count']] }
+          to_h { |row| [row['type'], row['count'].to_i] }
 
         hosts_by_compute_resources_type =
           feature(:foreman_database).
@@ -35,7 +35,7 @@ module Checks
               group by compute_resources.type
             SQL
           ).
-          to_h { |row| [row['type'] || 'baremetal', row['count']] }
+          to_h { |row| [row['type'] || 'baremetal', row['count'].to_i] }
         hosts_by_compute_profile =
           feature(:foreman_database).
           query(
@@ -45,7 +45,7 @@ module Checks
               group by compute_profile_id
             SQL
           ).
-          to_h { |row| [row['name'] || 'none', row['count']] }
+          to_h { |row| [row['name'] || 'none', row['count'].to_i] }
 
         # Bare metal
         nics_by_type_count =
@@ -57,7 +57,7 @@ module Checks
               group by type
             SQL
           ).
-          to_h { |row| [row['type'] || 'none', row['count']] }
+          to_h { |row| [(row['type'] || 'none').sub('Nic::', ''), row['count'].to_i] }
         discovery_rules_count = sql_count('discovery_rules')
         hosts_by_managed_count =
           feature(:foreman_database).
@@ -68,7 +68,7 @@ module Checks
               group by managed
             SQL
           ).
-          to_h { |row| [row['managed'], row['count']] }
+          to_h { |row| [row['managed'] == 't' ? 'managed' : 'unmanaged', row['count'].to_i] }
 
         # Templates
         non_default_templates_per_type =
@@ -80,7 +80,7 @@ module Checks
               group by type
             SQL
           ).
-          to_h { |row| [row['type'], row['count']] }
+          to_h { |row| [row['type'], row['count'].to_i] }
 
         data = {
           discovery_rules_count: discovery_rules_count,
@@ -90,12 +90,12 @@ module Checks
         data.merge!(flatten(hosts_by_compute_resources_type, 'hosts_by_compute_resources_type'))
         data.merge!(flatten(hosts_by_compute_profile, 'hosts_by_compute_profile'))
         data.merge!(flatten(nics_by_type_count, 'nics_by_type'))
-        data.merge!(flatten(hosts_by_managed_count, 'hosts_by_managed'))
+        data.merge!(flatten(hosts_by_managed_count, 'managed_hosts_count'))
         data.merge!(flatten(non_default_templates_per_type, 'non_default_templates_per_type'))
 
         self.data = data
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
     end
   end
 end

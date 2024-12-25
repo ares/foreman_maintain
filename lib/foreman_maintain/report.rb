@@ -26,7 +26,7 @@ module ForemanMaintain
 
     def flatten(hash, prefix = '')
       hash.each_with_object({}) do |(key, value), result|
-        new_key = "#{prefix}#{prefix.empty? ? '' : ':'}#{key}"
+        new_key = "#{prefix}#{prefix.empty? ? '' : flatten_separator}#{key}"
         if value.is_a? Hash
           result.merge!(flatten(value, new_key))
         else
@@ -50,6 +50,10 @@ module ForemanMaintain
       set_fail(e.message)
     rescue StandardError => e
       set_warn(e.message)
+    end
+
+    def flatten_separator
+      '|'
     end
   end
 end
