@@ -11,7 +11,7 @@ module Checks
         self.data = { template: 5 }
 
         # SQL example
-        # count = feature(:foreman_database).query("SELECT COUNT(*) FROM hosts WHERE managed = true AND created_at >= current_date - interval '3 months'")
+        # count = query("SELECT COUNT(*) FROM hosts WHERE managed = true AND created_at >= current_date - interval '3 months'")
         # result = count.first['count'].to_i
         # self.data = result
       end

@@ -11,7 +11,6 @@ module Checks
         # General
         smart_proxies_count = sql_count('smart_proxies')
         smart_proxies_creation_date =
-          feature(:foreman_database).
           query("select id, created_at from smart_proxies").
           to_h { |row| [row['id'], row['created_at']] }
 
@@ -21,13 +20,11 @@ module Checks
 
         custom_roles_count = sql_count('roles where origin = null')
         taxonomies_counts =
-          feature(:foreman_database).
           query("select type, count(*) from taxonomies group by type").
           to_h { |row| [row['type'], row['count'].to_i] }
 
         # Settings
         modified_settings =
-          feature(:foreman_database).
           query("select name from settings").
           map { |setting_line| setting_line['name'] }.
           join(',')
@@ -37,7 +34,6 @@ module Checks
 
         # Bookmarks
         bookmarks_by_public_by_type =
-          feature(:foreman_database).
           query(
             <<-SQL
               select public, owner_type, count(*)
@@ -52,7 +48,6 @@ module Checks
             ]
           end
         # bookmarks_by_owner =
-        #   feature(:foreman_database).
         #   query(
         #     <<-SQL
         #       select owner_type, owner_id, count(*)
@@ -69,7 +64,6 @@ module Checks
 
         # Mail notifications
         # users_per_mail_notification =
-        #   feature(:foreman_database).
         #   query(
         #     <<-SQL
         #       select

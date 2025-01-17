@@ -16,7 +16,6 @@ module Checks
 
         # Compute resources
         compute_resources_by_type =
-          feature(:foreman_database).
           query(
             <<-SQL
               select type, count(*)
@@ -27,7 +26,6 @@ module Checks
           to_h { |row| [row['type'], row['count'].to_i] }
 
         hosts_by_compute_resources_type =
-          feature(:foreman_database).
           query(
             <<-SQL
               select compute_resources.type, count(hosts.id)
@@ -37,7 +35,6 @@ module Checks
           ).
           to_h { |row| [row['type'] || 'baremetal', row['count'].to_i] }
         hosts_by_compute_profile =
-          feature(:foreman_database).
           query(
             <<-SQL
               select max(compute_profiles.name) as name, count(hosts.id)
@@ -49,7 +46,6 @@ module Checks
 
         # Bare metal
         nics_by_type_count =
-          feature(:foreman_database).
           query(
             <<-SQL
               select type, count(*)
@@ -60,7 +56,6 @@ module Checks
           to_h { |row| [(row['type'] || 'none').sub('Nic::', ''), row['count'].to_i] }
         discovery_rules_count = sql_count('discovery_rules')
         hosts_by_managed_count =
-          feature(:foreman_database).
           query(
             <<-SQL
               select managed, count(*)
@@ -72,7 +67,6 @@ module Checks
 
         # Templates
         non_default_templates_per_type =
-          feature(:foreman_database).
           query(
             <<-SQL
               select type, count(*) from templates

@@ -10,13 +10,11 @@ module Checks
       def run
         # Hosts
         hosts_by_type_count =
-          feature(:foreman_database).
           query("select type, count(*) from hosts group by type").
           to_h { |row| [(row['type'] || '').sub('Host::', ''), row['count'].to_i] }
 
         # OS usage
         hosts_by_os_count =
-          feature(:foreman_database).
           query(
             <<-SQL
               select max(operatingsystems.name) as os_name, count(*) as hosts_count
@@ -28,7 +26,6 @@ module Checks
 
         # Facts usage
         facts_by_type =
-          feature(:foreman_database).
           query(
             <<-SQL
               select fact_names.type,
@@ -43,7 +40,6 @@ module Checks
 
         # Audits
         audits_query =
-          feature(:foreman_database).
           query(
             <<-SQL
               select count(*) as records_count,
@@ -56,7 +52,6 @@ module Checks
 
         # Parameters
         parameters =
-          feature(:foreman_database).
           query("select type, count(*) from parameters group by type").
           to_h { |row| [row['type'], row['count'].to_i] }
 

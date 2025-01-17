@@ -27,7 +27,7 @@ module Checks
           " AND auth_sources.name != 'Hidden'")
         result["non_admin_users_count"] = count
 
-        role_ids = feature(:foreman_database).query("SELECT id FROM roles WHERE roles.builtin != 2 AND roles.origin IS NULL")
+        role_ids = query("SELECT id FROM roles WHERE roles.builtin != 2 AND roles.origin IS NULL")
         result["custom_roles_count"] = role_ids.size
         role_ids = role_ids.flat_map(&:values)
         count = sql_count("cached_user_roles WHERE cached_user_roles.role_id IN (#{role_ids.join(',')})")

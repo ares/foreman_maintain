@@ -7,20 +7,24 @@ module ForemanMaintain
 
     attr_accessor :data
 
+    def query(sql)
+      feature(:foreman_database).query(sql)
+    end
+
     def sql_count(sql, column: '*', cte: '')
       sql_as_count("COUNT(#{column})", sql, cte: cte)
     end
 
     def sql_as_count(selection, sql, cte: '')
       query = "#{cte} SELECT #{selection} AS COUNT FROM #{sql}"
-      feature(:foreman_database).query(query).first['count'].to_i
+      query(query).first['count'].to_i
     rescue StandardError
       nil
     end
 
     def sql_setting(name)
       sql = "SELECT value FROM settings WHERE name = '#{name}'"
-      result = feature(:foreman_database).query(sql).first
+      result = query(sql).first
       (result || {})['value']
     end
 
