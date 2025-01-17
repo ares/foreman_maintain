@@ -7,7 +7,7 @@ module Checks
 
       def run
         self.data = {
-          'instance_uuid' => sql_setting('instance_id').gsub(/^---\s+/, ''),
+          'instance_uuid' => YAML.safe_load(sql_setting('instance_id')),
         }
       end
     end
